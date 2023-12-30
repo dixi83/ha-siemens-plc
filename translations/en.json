@@ -5,10 +5,10 @@
             "existing_instance_updated": "Updated existing configuration."
         },
         "error": {
-            "cannot_connect": "Failed to connect",
-            "invalid_ip": "The IP ' {ip} ' is not a valid IPv4 address.",
-            "invalid_local_tsap": "The IP ' {local_tsap} ' is not a valid TSAP ID.",
-            "invalid_remote_tsap": "The IP ' {remote_tsap} ' is not a valid TSAP ID."
+            "error_cannot_connect": "Failed to connect",
+            "error_invalid_ip": "The IP ' {ip} ' is not a valid IPv4 address.",
+            "error_invalid_local_tsap": "The IP ' {local_tsap} ' is not a valid TSAP ID.",
+            "error_invalid_remote_tsap": "The IP ' {remote_tsap} ' is not a valid TSAP ID."
         },
         "step": {
             "logo": {
