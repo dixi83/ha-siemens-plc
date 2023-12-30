@@ -1,0 +1,49 @@
+{
+    "config": {
+        "abort": {
+            "already_configured": "Service is already configured",
+            "existing_instance_updated": "Updated existing configuration."
+        },
+        "error": {
+            "cannot_connect": "Failed to connect",
+            "invalid_ip": "The IP ' {ip} ' is not a valid IPv4 address.",
+            "invalid_local_tsap": "The IP ' {local_tsap} ' is not a valid TSAP ID.",
+            "invalid_remote_tsap": "The IP ' {remote_tsap} ' is not a valid TSAP ID."
+        },
+        "step": {
+            "logo": {
+                "data": {
+                    "ip_address": "IP Address",
+                    "local_tsap": "Local TSAP ID",
+                    "remote_tsap": "Partner TSAP ID"
+                },
+                "data_description": {
+                    "ip_address": "PLC's IP address. (e.g. 172.16.16.10)",
+                    "local_tsap": "Hexadecimal string of the local TSAP ID, '2002' for '20.02'",
+                    "remote_tsap": "Hexadecimal string of the partners TSAP ID, '0102' for '01.02'"
+                },
+                "description": "Enter the connection details of your Siemens PLC"
+            },
+            "s7": {
+                "data": {
+                    "ip_address": "IP Address",
+                    "rack": "Rack",
+                    "slot": "Slot"
+                },
+                "data_description": {
+                    "ip_address": "PLC's IP address. (e.g. 172.16.16.10)",
+                    "rack": "In most cases: is should be set to 0, check your hardware configuration",
+                    "slot": "In most cases: 2 for 300 series, 1 for 1200's and 1500's. check your hardware configuration"
+                },
+                "description": "Enter the connection details of your Siemens PLC"
+            },
+            "user": {
+                "menu_options": {
+                    "logo": "Siemens Logo! PLC's",
+                    "s7": "Siemens S7 PLC's"
+                },
+                "description": "Which Siemens PLC would you like to integrate?"
+            }
+        }
+    }
+}

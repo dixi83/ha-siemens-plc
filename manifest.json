@@ -1,0 +1,12 @@
+{
+    "domain": "siemens_plc",
+    "name": "Siemens PLC integration",
+    "requirements": [
+        "python-snap7==1.3"
+    ],
+    "iot_slass": "local_polling",
+    "integration_type": "device",
+    "loggers": ["siemens_plc"],
+    "config_flow": true,
+    "version": "0.0.1"
+}
