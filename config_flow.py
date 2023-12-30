@@ -50,7 +50,7 @@ class SiemensS7ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             if valid_ip and valid_local_tsap and valid_remote_tsap:
                 try:
                     _LOGGER.debug(f"{DOMAIN} Connecting PLC at ip: {ip}")
-                    client = snap7.logo.Logo(lib_location=f"{os.getcwd()}/lib/libsnap7.so")
+                    client = snap7.logo.Logo(lib_location=self.get_lib_location())
                     result = client.connect(ip, int(local_tsap, 16), int(remote_tsap, 16))
                     if result == None:
                         client.disconnect()
