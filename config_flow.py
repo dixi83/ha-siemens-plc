@@ -8,6 +8,7 @@ import os
 
 from homeassistant import config_entries, exceptions
 from homeassistant.const import CONF_IP_ADDRESS
+import homeassistant.helpers.config_validation as cv
 import voluptuous as vol
 
 from .const import DOMAIN
@@ -23,30 +24,32 @@ class SiemensS7ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def async_step_user(self, user_input=None):
         """Handle the initial Button+ setup, showing the 2 options."""
-        _LOGGER.info(f"{DOMAIN} Current path is {__file__}")
         return self.async_show_menu(
             step_id="user",
             menu_options=["logo", "s7"],
         )
 
     async def async_step_logo(self, user_input=None):
+        """Siemens PLC configuration step for Logo! PLC's"""
         errors = {}
-
-        _LOGGER.debug(f"Fetch website step {user_input}")
-
         ip = None
+        local_tsap = None
+        remote_tsap = None
+        
+        _LOGGER.debug(f"{DOMAIN} Siemens Logo! PLC step {user_input}")
 
         if user_input is not None:
-            ip = user_input.get(CONF_IP_ADDRESS, None)
-            local_tsap = user_input["local_tsap"]
-            remote_tsap = user_input["remote_tsap"]
+            ip                = user_input.get(CONF_IP_ADDRESS, None)
+            local_tsap        = user_input["local_tsap"]
+            remote_tsap       = user_input["remote_tsap"]
+
             valid_ip          = self.validate_ip(ip) 
             valid_local_tsap  = self.validate_tsap_id(local_tsap) 
             valid_remote_tsap = self.validate_tsap_id(remote_tsap)
 
             if valid_ip and valid_local_tsap and valid_remote_tsap:
                 try:
-                    _LOGGER.debug(f"Connecting PLC at ip: {ip}")
+                    _LOGGER.debug(f"{DOMAIN} Connecting PLC at ip: {ip}")
                     client = snap7.logo.Logo(lib_location=f"{os.getcwd()}/lib/libsnap7.so")
                     result = client.connect(ip, int(local_tsap, 16), int(remote_tsap, 16))
                     if result == None:
@@ -66,7 +69,7 @@ class SiemensS7ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                         ex,
                         traceback.format_exc()
                     )
-                    errors["base"] = "cannot_connect"
+                    errors["base"] = "error_cannot_connect"
 
                 except Exception as ex:  # pylint: disable=broad-except
                     _LOGGER.error(
@@ -74,47 +77,54 @@ class SiemensS7ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                         ex,
                         traceback.format_exc()
                     )
-                    errors["base"] = "cannot_connect"
+                    errors["base"] = "error_cannot_connect"
 
             else:
                 if not valid_local_tsap:
-                    errors["base"] = 'invalid_local_tsap'
+                    errors["base"] = 'error_invalid_local_tsap'
                 if not valid_remote_tsap:
-                    errors["base"] = 'invalid_remote_tsap'
+                    errors["base"] = 'error_invalid_remote_tsap'
                 if not valid_ip:
-                    errors["base"] = 'invalid_ip'
+                    errors["base"] = 'error_invalid_ip'
 
         return self.async_show_form(
             step_id="logo",
             data_schema=vol.Schema(
                 {
                     CONF_IP_ADDRESS: str,
-                    vol.Required("tsap_local"): str,
-                    vol.Required("tsap_remote"): str,
+                    vol.Required("local_tsap"): vol.All(str, vol.Length(4, 4), vol.Match(r'^[a-fA-F0-9]+$')),
+                    vol.Required("remote_tsap"): vvol.All(str, vol.Length(4, 4), vol.Match(r'^[a-fA-F0-9]+$')),
                 }
             ),
-            errors=errors #,
-            # description_placeholders={
-            #     "ip": ip
-            # }
+            errors=errors ,
+            description_placeholders={
+                "ip": ip,
+                "local_tsap": local_tsap,
+                "remote_tsap": remote_tsap
+            }
         )
 
     async def async_step_s7(self, user_input=None):
+        """Siemens PLC configuration step for Logo! PLC's"""
         errors = {}
         ip = None
+        rack = None
+        slot = None
+
+        _LOGGER.debug(f"{DOMAIN} Siemens S7 PLC step {user_input}")
+
         if user_input is not None:
             ip = user_input.get(CONF_IP_ADDRESS, None)
             rack = user_input["rack"]
             slot = user_input["slot"]
-            valid = (
-                    self.validate_ip(ip)
-                and self.validate_rack(rack)
-                and self.validate_slot(slot)
-            )
-            if valid:
+            valid_ip          = self.validate_ip(ip) 
+            valid_local_tsap  = self.validate_tsap_id(local_tsap) 
+            valid_remote_tsap = self.validate_tsap_id(remote_tsap)
+
+            if valid_ip and valid_local_tsap and valid_remote_tsap:
                 try:
-                    _LOGGER.debug(f"Connecting PLC at ip: {ip}")
-                    client = snap7.client.Client(lib_location=f"{os.path.dirname(os.path.abspath(__file__))}/lib/libsnap7.so")
+                    _LOGGER.debug(f"{DOMAIN} Connecting PLC at ip: {ip}")
+                    client = snap7.client.Client(lib_location=self.get_lib_location())
                     result = client.connect(ip, rack, slot) 
                     if result == 0:
                         client.disconnect()
@@ -142,24 +152,31 @@ class SiemensS7ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                         traceback.format_exc()
                     )
 
-                    errors["base"] = "cannot_connect"
+                    errors["base"] = "error_cannot_connect"
 
             else:
-                errors["base"] = 'invalid_ip'
+                if not valid_local_tsap:
+                    errors["base"] = 'error_invalid_local_tsap'
+                if not valid_remote_tsap:
+                    errors["base"] = 'error_invalid_remote_tsap'
+                if not valid_ip:
+                    errors["base"] = 'error_invalid_ip'
 
         return self.async_show_form(
             step_id="s7",
             data_schema=vol.Schema(
                 {
                     CONF_IP_ADDRESS: str,
-                    vol.Required("rack"): int,
-                    vol.Required("slot"): int
+                    vol.Required("rack"): vol.All(int, vol.Range(0, 63)),
+                    vol.Required("slot"): vol.All(int, vol.Range(0, 63)),
                 }
             ),
-            errors=errors #,
-            # description_placeholders={
-            #     "ip": ip
-            # }
+            errors=errors ,
+            description_placeholders={
+                "ip": ip,
+                "rack": rack,
+                "slot": slot
+            }
         )
 
     def validate_ip(self, ip) -> bool:
@@ -170,11 +187,17 @@ class SiemensS7ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             return False
             
     def validate_rack(self, rack) -> bool:
+        # TODO: check range
         return type(rack) is int
 
     def validate_slot(self, slot) -> bool:
+        # TODO: check range
         return type(slot) is int
 
     def validate_tsap_id(self, tsap_id) -> bool:
+        # TODO: use regular expression to check if it is a hex string
         return len(tsap_id) == 4
 
+    def get_lib_location() -> str:
+        # TODO: find cpu architecture and os en determine library to be used
+        return f"{os.path.dirname(os.path.abspath(__file__))}/lib/linux_x86_x64/libsnap7.so"
