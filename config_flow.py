@@ -93,7 +93,7 @@ class SiemensS7ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 {
                     CONF_IP_ADDRESS: str,
                     vol.Required("local_tsap"): vol.All(str, vol.Length(4, 4), vol.Match(r'^[a-fA-F0-9]+$')),
-                    vol.Required("remote_tsap"): vvol.All(str, vol.Length(4, 4), vol.Match(r'^[a-fA-F0-9]+$')),
+                    vol.Required("remote_tsap"): vol.All(str, vol.Length(4, 4), vol.Match(r'^[a-fA-F0-9]+$')),
                 }
             ),
             errors=errors ,
@@ -114,14 +114,15 @@ class SiemensS7ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         _LOGGER.debug(f"{DOMAIN} Siemens S7 PLC step {user_input}")
 
         if user_input is not None:
-            ip = user_input.get(CONF_IP_ADDRESS, None)
+            ip   = user_input.get(CONF_IP_ADDRESS, None)
             rack = user_input["rack"]
             slot = user_input["slot"]
-            valid_ip          = self.validate_ip(ip) 
-            valid_local_tsap  = self.validate_tsap_id(local_tsap) 
-            valid_remote_tsap = self.validate_tsap_id(remote_tsap)
 
-            if valid_ip and valid_local_tsap and valid_remote_tsap:
+            valid_ip   = self.validate_ip(ip) 
+            valid_rack = self.validate_rack(rack) 
+            valid_slot = self.validate_slot(slot)
+
+            if valid_ip and valid_rack and valid_slot:
                 try:
                     _LOGGER.debug(f"{DOMAIN} Connecting PLC at ip: {ip}")
                     client = snap7.client.Client(lib_location=self.get_lib_location())
@@ -155,10 +156,10 @@ class SiemensS7ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     errors["base"] = "error_cannot_connect"
 
             else:
-                if not valid_local_tsap:
-                    errors["base"] = 'error_invalid_local_tsap'
-                if not valid_remote_tsap:
-                    errors["base"] = 'error_invalid_remote_tsap'
+                if not valid_rack:
+                    errors["base"] = 'error_invalid_rack'
+                if not valid_slot:
+                    errors["base"] = 'error_invalid_slot'
                 if not valid_ip:
                     errors["base"] = 'error_invalid_ip'
 
@@ -167,8 +168,8 @@ class SiemensS7ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             data_schema=vol.Schema(
                 {
                     CONF_IP_ADDRESS: str,
-                    vol.Required("rack"): vol.All(int, vol.Range(0, 63)),
-                    vol.Required("slot"): vol.All(int, vol.Range(0, 63)),
+                    vol.Required("rack"): vol.All(int, vol.Clamp(0, 63)),
+                    vol.Required("slot"): vol.All(int, vol.Clamp(0, 63)),
                 }
             ),
             errors=errors ,
@@ -198,6 +199,6 @@ class SiemensS7ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         # TODO: use regular expression to check if it is a hex string
         return len(tsap_id) == 4
 
-    def get_lib_location() -> str:
+    def get_lib_location(self) -> str:
         # TODO: find cpu architecture and os en determine library to be used
         return f"{os.path.dirname(os.path.abspath(__file__))}/lib/linux_x86_x64/libsnap7.so"
