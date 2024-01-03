@@ -4,3 +4,6 @@
 # name for the integration.
 DOMAIN = "siemens_plc"
 MANUFACTURER = "Siemens"
+RACKSLOT_MIN=0
+RACKSLOT_MAX=63
+
