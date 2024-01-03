@@ -1,1 +1,8 @@
 __pycache__
+/.idea/.gitignore
+/.idea/ha-siemens-plc.iml
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/inspectionProfiles/profiles_settings.xml
+/.idea/vagrant.xml
+/.idea/vcs.xml
