@@ -17,7 +17,7 @@ from .common import get_lib_location
 
 _LOGGER = logging.getLogger(__name__)
 
-class SiemensS7ConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
+class SiemensPlcConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Siemens PLC config flow."""
     VERSION = 1
     CONNECTION_CLASS = config_entries.CONN_CLASS_LOCAL_PUSH
