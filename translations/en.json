@@ -15,11 +15,13 @@
         "step": {
             "logo": {
                 "data": {
+                    "name": "Device Name",
                     "ip_address": "IP Address",
                     "local_tsap": "Local TSAP ID",
                     "remote_tsap": "Partner TSAP ID"
                 },
                 "data_description": {
+                    "name": "Name of the device. (e.g. PLC garage door)",
                     "ip_address": "PLC's IP address. (e.g. 172.16.16.10)",
                     "local_tsap": "Hexadecimal string of the local TSAP ID, '2002' for '20.02'",
                     "remote_tsap": "Hexadecimal string of the partners TSAP ID, '0102' for '01.02'"
@@ -28,11 +30,13 @@
             },
             "s7": {
                 "data": {
+                    "name": "Device Name",
                     "ip_address": "IP Address",
                     "rack": "Rack",
                     "slot": "Slot"
                 },
                 "data_description": {
+                    "name": "Name of the device. (e.g. PLC garage door)",
                     "ip_address": "PLC's IP address. (e.g. 172.16.16.10)",
                     "rack": "In most cases: is should be set to 0, check your hardware configuration",
                     "slot": "In most cases: 2 for 300 series, 1 for 1200's and 1500's. check your hardware configuration"
