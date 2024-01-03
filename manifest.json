@@ -2,7 +2,8 @@
     "domain": "siemens_plc",
     "name": "Siemens PLC integration",
     "requirements": [
-        "python-snap7==1.3"
+        "python-snap7==1.3",
+        "get-mac==0.9.2"
     ],
     "iot_slass": "local_polling",
     "integration_type": "device",
